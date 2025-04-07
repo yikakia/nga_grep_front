@@ -12,19 +12,19 @@
 </head>
 <body class="bg-gray-100">
 <div class="container mx-auto p-4">
-    <h1 class="text-2xl font-bold mb-4">Time Series Chart</h1>
+    <h1 class="text-2xl font-bold mb-4">大时代景气指数(NGA:706)</h1>
 
     <div class="flex space-x-4 mb-4">
         <div>
-            <label for="startDate" class="block text-gray-700 text-sm font-bold mb-2">Start Date:</label>
+            <label for="startDate" class="block text-gray-700 text-sm font-bold mb-2">开始时间范围:</label>
             <input type="datetime-local" id="startDate" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
         </div>
         <div>
-            <label for="endDate" class="block text-gray-700 text-sm font-bold mb-2">End Date:</label>
+            <label for="endDate" class="block text-gray-700 text-sm font-bold mb-2">结束时间范围:</label>
             <input type="datetime-local" id="endDate" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
         </div>
         <div>
-            <button id="fetchData" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Fetch Data</button>
+            <button id="fetchData" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">查询</button>
         </div>
     </div>
 
@@ -45,7 +45,7 @@
     }
 
     function fetchData(startDateUTC, endDateUTC) {
-        const apiUrl = `https://nga_grep.yikakia.com/api/timeseries?startDate=${startDateUTC}&endDate=${endDateUTC}`;
+        const apiUrl = `http://nga_grep.yikakia.com/api/timeseries?startDate=${startDateUTC}&endDate=${endDateUTC}`;
 
 
         fetch(apiUrl)
