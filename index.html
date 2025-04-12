@@ -114,7 +114,7 @@
             type: 'line',
             data: {
                 labels: labels,
-                datasets: datasets
+                datasets: datasets // 使用传入的 datasets
             },
             options: {
                 scales: {
@@ -159,7 +159,6 @@
         const compareOffsetInput = document.getElementById('compareOffset');
         const compareUnitSelect = document.getElementById('compareUnit');
 
-        // --- 函数：根据快速选择设置日期范围 ---
         function setDateRange(range) {
             const now = moment();
             let start;
@@ -182,8 +181,8 @@
         // --- 事件监听器：快速选择变化 ---
         rangeSelect.addEventListener('change', () => {
             setDateRange(rangeSelect.value);
-            // 可选: 当快速选择改变时，自动触发查询
-            // fetchDataButton.click();
+            // 当快速选择改变时，自动触发查询
+            fetchDataButton.click();
         });
 
         // --- 事件监听器：点击查询按钮 ---
@@ -223,7 +222,6 @@
                 }
             }
 
-            // --- 显示加载状态 (可选) ---
             fetchDataButton.disabled = true;
             fetchDataButton.textContent = "查询中...";
             // Consider adding a loading spinner overlay on the chart
@@ -261,12 +259,12 @@
                     if (compareData.length === currentData.length) {
                         datasets.push({
                             label: `对比数据 (${compareOffset}${compareUnit === 'days' ? '天' : '小时'}前)`,
-                            // 注意：这里的 X 轴标签仍然使用主数据的标签
                             data: compareData.map(item => item.value),
                             borderColor: 'rgb(255, 99, 132)',
                             tension: 0.1,
                             pointRadius: 1,
-                            pointHoverRadius: 5
+                            pointHoverRadius: 5,
+                            borderDash: [5, 5] // <--- 添加这一行使对比线变成虚线
                         });
                     } else {
                         console.warn("对比数据的点数与主数据不匹配，可能导致图表错位。主数据点数:", currentData.length, "对比数据点数:", compareData.length);
@@ -275,28 +273,27 @@
                             label: `对比数据 (${compareOffset}${compareUnit === 'days' ? '天' : '小时'}前) - 数据点不匹配`,
                             data: [], // Or try aligning based on timestamps if possible
                             borderColor: 'rgb(255, 99, 132)',
-                            borderDash: [5, 5], // Indicate potential issue visually
+                            borderDash: [5, 5], // 保持虚线提示
                             tension: 0.1
                         });
                     }
                 } else if (compareOffset > 0 && !compareData) {
                     console.warn("请求了对比数据，但未能获取或数据为空。");
-                    // Optional: Add an empty dataset to indicate comparison was attempted but failed
                     datasets.push({
                         label: `对比数据 (${compareOffset}${compareUnit === 'days' ? '天' : '小时'}前) - 获取失败`,
                         data: [],
                         borderColor: 'rgb(255, 99, 132)',
-                        borderDash: [5, 5], // Indicate failure
+                        borderDash: [5, 5], // 保持虚线提示
                         tension: 0.1
                     });
                 }
+                // **** 修改结束 ****
 
-                updateChart(labels, datasets);
+                updateChart(labels, datasets); // 将构建好的 datasets 传递给 updateChart
 
             }).catch(err => {
                 console.error("数据获取或处理失败:", err);
                 alert(`获取数据失败: ${err.message}。请检查网络或控制台日志。`);
-                // 可选： 清空图表或显示错误信息
                 if (chart) chart.destroy();
                 ctx.fillText("加载数据出错", 10, 50); // Simple error message on canvas
 
@@ -304,14 +301,10 @@
                 // --- 恢复按钮状态 ---
                 fetchDataButton.disabled = false;
                 fetchDataButton.textContent = "查询";
-                // Hide loading spinner if used
             });
         });
 
-
-        // ================================================
         // --- 初始化默认值 ---
-        // ================================================
         console.log("Setting initial default values...");
 
         // 1. 设置默认快速选择为 "最近24小时"
@@ -322,13 +315,10 @@
 
         // 3. 根据默认的 "最近24小时" 设置开始和结束时间输入框
         const now = moment();
-        const twentyFourHoursAgo = moment().subtract(24, 'hours'); // 修改这里
-        // 确保使用本地时间格式填充输入框
+        const twentyFourHoursAgo = moment().subtract(24, 'hours');
         startDateInput.value = twentyFourHoursAgo.local().format('YYYY-MM-DDTHH:mm');
         endDateInput.value = now.local().format('YYYY-MM-DDTHH:mm');
-
-        // 4. 默认对比偏移的单位为天
-        compareUnitSelect.value = 'days';
+        compareUnitSelect.value = 'days'; // 默认对比单位为天
 
         console.log("Initial Start Date (Local):", startDateInput.value);
         console.log("Initial End Date (Local):", endDateInput.value);
@@ -336,16 +326,8 @@
         console.log("Initial Range Select:", rangeSelect.value);
         console.log("Initial compareUnit:", compareUnitSelect.value);
 
-
-        // 4. 自动触发一次初始查询 (使用上面设置好的默认值)
         console.log("Triggering initial data fetch...");
-        // 使用 setTimeout 确保浏览器有时间更新输入框的值，虽然通常不是必需的
-        // setTimeout(() => {
-        //     fetchDataButton.click();
-        // }, 0);
-        // 直接点击通常也可以
-        fetchDataButton.click();
-
+        fetchDataButton.click(); // 触发初始查询
     });
 </script>
 </body>
