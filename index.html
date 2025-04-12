@@ -21,7 +21,7 @@
                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                 <option value="2h">最近2小时</option>
                 <option value="8h">最近8小时</option>
-                <option value="24h">最近24小时</option>
+                <option value="24h">最近24小时</option> <!-- 稍后JS会设置这个为默认 -->
                 <option value="3d">最近3天</option>
                 <option value="5d">最近5天</option>
                 <option value="7d">最近7天</option>
@@ -44,7 +44,7 @@
             <select id="timeInterval"
                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                 <option value="5m">5 分钟</option>
-                <option value="15m">15 分钟</option>
+                <option value="15m">15 分钟</option> <!-- 稍后JS会设置这个为默认 -->
                 <option value="30m">30 分钟</option>
                 <option value="60m">1 小时</option>
                 <option value="120m">2 小时</option>
@@ -62,7 +62,7 @@
                 <select id="compareUnit"
                         class="shadow appearance-none border rounded py-2 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                     <option value="hours">小时</option>
-                    <option value="days">天</option>
+                    <option value="days">天</option> <!-- 稍后JS会设置这个为默认 -->
                 </select>
             </div>
         </div>
@@ -84,7 +84,10 @@
     let chart;
 
     function toUTC(dateString) {
-        return moment(dateString).utc().format('YYYY-MM-DD HH:mm');
+        // Handle potential empty string or invalid date input gracefully
+        if (!dateString) return null;
+        const m = moment(dateString);
+        return m.isValid() ? m.utc().format('YYYY-MM-DD HH:mm') : null;
     }
 
     function fromUTC(utcTimestamp) {
@@ -92,7 +95,12 @@
     }
 
     function fetchData(startDateUTC, endDateUTC, timeInterval) {
+        // Add validation for parameters
+        if (!startDateUTC || !endDateUTC || !timeInterval) {
+            return Promise.reject(new Error("无效的查询参数"));
+        }
         const url = `https://nga_grep.yikakia.com/api/timeseries?startDate=${startDateUTC}&endDate=${endDateUTC}&timeInterval=${timeInterval}`;
+        console.log("Fetching data from:", url); // Log URL for debugging
         return fetch(url).then(res => {
             if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
             return res.json();
@@ -113,28 +121,45 @@
                     x: {
                         title: {
                             display: true,
-                            text: '时间'
+                            text: '时间 (本地时间)' // Clarify timezone
                         }
                     },
                     y: {
                         title: {
                             display: true,
                             text: '发帖数'
-                        }
+                        },
+                        beginAtZero: true // Often useful for counts
                     }
-                }
+                },
+                plugins: {
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    }
+                },
+                interaction: { // Improve hover performance
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                },
+                responsive: true,
+                maintainAspectRatio: true // Or false depending on layout needs
             }
         });
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+        // --- 获取 DOM 元素的引用 ---
         const startDateInput = document.getElementById('startDate');
         const endDateInput = document.getElementById('endDate');
         const fetchDataButton = document.getElementById('fetchData');
         const timeIntervalSelect = document.getElementById('timeInterval');
         const rangeSelect = document.getElementById('rangeSelect');
         const compareOffsetInput = document.getElementById('compareOffset');
+        const compareUnitSelect = document.getElementById('compareUnit');
 
+        // --- 函数：根据快速选择设置日期范围 ---
         function setDateRange(range) {
             const now = moment();
             let start;
@@ -145,66 +170,182 @@
                 case '3d': start = moment().subtract(3, 'days'); break;
                 case '5d': start = moment().subtract(5, 'days'); break;
                 case '7d': start = moment().subtract(7, 'days'); break;
-                default: return;
+                default: // 如果有自定义或其他情况，不清空输入框，让用户手动调整
+                    console.warn("未知的快速选择范围:", range);
+                    return;
             }
-            startDateInput.value = start.format('YYYY-MM-DDTHH:mm');
-            endDateInput.value = now.format('YYYY-MM-DDTHH:mm');
+            // 使用 moment().local() 确保输入框显示的是本地时间
+            startDateInput.value = start.local().format('YYYY-MM-DDTHH:mm');
+            endDateInput.value = now.local().format('YYYY-MM-DDTHH:mm');
         }
 
+        // --- 事件监听器：快速选择变化 ---
         rangeSelect.addEventListener('change', () => {
             setDateRange(rangeSelect.value);
+            // 可选: 当快速选择改变时，自动触发查询
+            // fetchDataButton.click();
         });
 
+        // --- 事件监听器：点击查询按钮 ---
         fetchDataButton.addEventListener('click', () => {
             const startDateLocal = startDateInput.value;
             const endDateLocal = endDateInput.value;
             const timeInterval = timeIntervalSelect.value;
             const compareOffset = parseInt(compareOffsetInput.value) || 0;
-            const compareUnit = document.getElementById('compareUnit').value; // 'hours' or 'days'
+            const compareUnit = compareUnitSelect.value; // Use correct variable name
 
             const startDateUTC = toUTC(startDateLocal);
             const endDateUTC = toUTC(endDateLocal);
 
-            const startCompareUTC = moment.utc(startDateUTC).subtract(compareOffset, compareUnit).format('YYYY-MM-DD HH:mm');
-            const endCompareUTC = moment.utc(endDateUTC).subtract(compareOffset, compareUnit).format('YYYY-MM-DD HH:mm');
+            // --- 输入验证 ---
+            if (!startDateUTC || !endDateUTC) {
+                alert("请输入有效的开始和结束时间！");
+                return;
+            }
+            if (moment(endDateLocal).isBefore(moment(startDateLocal))) {
+                alert("结束时间不能早于开始时间！");
+                return;
+            }
+
+            // 计算对比时间范围 (确保是 UTC)
+            let startCompareUTC = null;
+            let endCompareUTC = null;
+            if (compareOffset > 0) {
+                const startMomentUTC = moment.utc(startDateUTC);
+                const endMomentUTC = moment.utc(endDateUTC);
+                if (startMomentUTC.isValid() && endMomentUTC.isValid()) {
+                    startCompareUTC = startMomentUTC.subtract(compareOffset, compareUnit).format('YYYY-MM-DD HH:mm');
+                    endCompareUTC = endMomentUTC.subtract(compareOffset, compareUnit).format('YYYY-MM-DD HH:mm');
+                } else {
+                    console.error("无法计算对比时间，原始时间无效。");
+                    alert("无法计算对比时间，请检查输入的原始时间。");
+                    return; // Stop if base dates are invalid for comparison calc
+                }
+            }
+
+            // --- 显示加载状态 (可选) ---
+            fetchDataButton.disabled = true;
+            fetchDataButton.textContent = "查询中...";
+            // Consider adding a loading spinner overlay on the chart
+
 
             Promise.all([
                 fetchData(startDateUTC, endDateUTC, timeInterval),
-                compareOffset > 0 ? fetchData(startCompareUTC, endCompareUTC, timeInterval) : Promise.resolve(null)
+                // 只有在需要对比且对比时间有效时才获取对比数据
+                (compareOffset > 0 && startCompareUTC && endCompareUTC)
+                    ? fetchData(startCompareUTC, endCompareUTC, timeInterval)
+                    : Promise.resolve(null) // 返回 null 表示没有对比数据
             ]).then(([currentData, compareData]) => {
+                // --- 数据处理和图表更新 ---
+                if (!currentData || !Array.isArray(currentData)) {
+                    throw new Error("主数据格式无效");
+                }
+
+                // 主数据
                 const labels = currentData.map(item => fromUTC(item.timestamp));
                 const datasets = [
                     {
                         label: '当前数据',
                         data: currentData.map(item => item.value),
                         borderColor: 'rgb(75, 192, 192)',
-                        tension: 0.1
+                        tension: 0.1,
+                        pointRadius: 1, // Smaller points for dense data
+                        pointHoverRadius: 5
                     }
                 ];
-                if (compareData) {
+
+                // 对比数据 (只有在成功获取后才添加)
+                if (compareData && Array.isArray(compareData) && compareData.length > 0) {
+                    // 重要: 确保对比数据的时间戳数量与主数据匹配或进行对齐处理
+                    // 简单处理：假设API返回的数据点数和时间间隔一致
+                    if (compareData.length === currentData.length) {
+                        datasets.push({
+                            label: `对比数据 (${compareOffset}${compareUnit === 'days' ? '天' : '小时'}前)`,
+                            // 注意：这里的 X 轴标签仍然使用主数据的标签
+                            data: compareData.map(item => item.value),
+                            borderColor: 'rgb(255, 99, 132)',
+                            tension: 0.1,
+                            pointRadius: 1,
+                            pointHoverRadius: 5
+                        });
+                    } else {
+                        console.warn("对比数据的点数与主数据不匹配，可能导致图表错位。主数据点数:", currentData.length, "对比数据点数:", compareData.length);
+                        // 可以选择不显示对比数据或尝试更复杂的对齐逻辑
+                        datasets.push({
+                            label: `对比数据 (${compareOffset}${compareUnit === 'days' ? '天' : '小时'}前) - 数据点不匹配`,
+                            data: [], // Or try aligning based on timestamps if possible
+                            borderColor: 'rgb(255, 99, 132)',
+                            borderDash: [5, 5], // Indicate potential issue visually
+                            tension: 0.1
+                        });
+                    }
+                } else if (compareOffset > 0 && !compareData) {
+                    console.warn("请求了对比数据，但未能获取或数据为空。");
+                    // Optional: Add an empty dataset to indicate comparison was attempted but failed
                     datasets.push({
-                        label: `对比数据 (${compareOffset}${compareUnit === 'days' ? '天' : '小时'}前)`,
-                        data: compareData.map(item => item.value),
+                        label: `对比数据 (${compareOffset}${compareUnit === 'days' ? '天' : '小时'}前) - 获取失败`,
+                        data: [],
                         borderColor: 'rgb(255, 99, 132)',
+                        borderDash: [5, 5], // Indicate failure
                         tension: 0.1
                     });
                 }
+
                 updateChart(labels, datasets);
+
             }).catch(err => {
-                console.error("数据获取失败:", err);
-                alert("获取数据失败，请检查网络或控制台日志。");
+                console.error("数据获取或处理失败:", err);
+                alert(`获取数据失败: ${err.message}。请检查网络或控制台日志。`);
+                // 可选： 清空图表或显示错误信息
+                if (chart) chart.destroy();
+                ctx.fillText("加载数据出错", 10, 50); // Simple error message on canvas
+
+            }).finally(() => {
+                // --- 恢复按钮状态 ---
+                fetchDataButton.disabled = false;
+                fetchDataButton.textContent = "查询";
+                // Hide loading spinner if used
             });
         });
 
 
-        // 初始化默认值
-        const now = moment();
-        const twoHundredMinutesAgo = moment().subtract(200, 'minutes');
-        startDateInput.value = twoHundredMinutesAgo.format('YYYY-MM-DDTHH:mm');
-        endDateInput.value = now.format('YYYY-MM-DDTHH:mm');
+        // ================================================
+        // --- 初始化默认值 ---
+        // ================================================
+        console.log("Setting initial default values...");
 
-        // 自动触发一次初始查询
+        // 1. 设置默认快速选择为 "最近24小时"
+        rangeSelect.value = '24h';
+
+        // 2. 设置默认时间间隔为 "15分钟"
+        timeIntervalSelect.value = '15m';
+
+        // 3. 根据默认的 "最近24小时" 设置开始和结束时间输入框
+        const now = moment();
+        const twentyFourHoursAgo = moment().subtract(24, 'hours'); // 修改这里
+        // 确保使用本地时间格式填充输入框
+        startDateInput.value = twentyFourHoursAgo.local().format('YYYY-MM-DDTHH:mm');
+        endDateInput.value = now.local().format('YYYY-MM-DDTHH:mm');
+
+        // 4. 默认对比偏移的单位为天
+        compareUnitSelect.value = 'days';
+
+        console.log("Initial Start Date (Local):", startDateInput.value);
+        console.log("Initial End Date (Local):", endDateInput.value);
+        console.log("Initial Time Interval:", timeIntervalSelect.value);
+        console.log("Initial Range Select:", rangeSelect.value);
+        console.log("Initial compareUnit:", compareUnitSelect.value);
+
+
+        // 4. 自动触发一次初始查询 (使用上面设置好的默认值)
+        console.log("Triggering initial data fetch...");
+        // 使用 setTimeout 确保浏览器有时间更新输入框的值，虽然通常不是必需的
+        // setTimeout(() => {
+        //     fetchDataButton.click();
+        // }, 0);
+        // 直接点击通常也可以
         fetchDataButton.click();
+
     });
 </script>
 </body>
