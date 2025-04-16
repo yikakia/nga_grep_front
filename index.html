@@ -1,14 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>大时代景气指数</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com" data-cfasync="false"></script>
+    <script data-cfasync="false">
+        tailwind.config = {
+            darkMode: 'class', // 显式通过 class 控制
+        }
+    </script>
     <script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/Chart.js/3.7.1/chart.min.js"></script>
     <script src="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/moment.js/2.29.1/moment.min.js"></script>
     <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/moment-timezone/0.5.34/moment-timezone.min.js"></script>
-
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-8M3SQNFGV5"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -20,45 +24,52 @@
         gtag('js', new Date());
         gtag('config', 'G-8M3SQNFGV5');
     </script>
-
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
 <div class="container mx-auto p-4">
-    <div class="w-full max-w-6xl mx-auto h-[300px] sm:h-[350px] md:h-[400px] lg:h-[500px]">
+    <!-- 深色模式切换按钮 -->
+    <div class="flex justify-end mb-4">
+        <button id="toggleDark" class="flex items-center gap-1 px-3 py-2 rounded bg-gray-200 dark:bg-gray-700 dark:text-white relative" title="切换到浅色模式">
+            <span id="themeIcon">☀</span>
+        </button>
 
+    </div>
+
+    <div class="w-full max-w-6xl mx-auto h-[300px] sm:h-[350px] md:h-[400px] lg:h-[500px]">
         <h1 class="text-2xl font-bold mb-4">大时代景气指数(NGA:706)</h1>
         <div class="flex flex-wrap items-center gap-4 mb-4">
-
             <div>
-                <label for="rangeSelect" class="block text-gray-700 text-sm font-bold mb-2">快速选择:</label>
+                <label for="rangeSelect"
+                       class="block text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">快速选择:</label>
                 <select id="rangeSelect"
-                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        class="shadow border rounded w-full py-2 px-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:shadow-outline">
                     <option value="2h">最近2小时</option>
                     <option value="8h">最近8小时</option>
-                    <option value="24h">最近24小时</option> <!-- 稍后JS会设置这个为默认 -->
+                    <option value="24h">最近24小时</option>
                     <option value="3d">最近3天</option>
                     <option value="5d">最近5天</option>
                     <option value="7d">最近7天</option>
                 </select>
             </div>
-
             <div>
-                <label for="startDate" class="block text-gray-700 text-sm font-bold mb-2">开始时间范围:</label>
+                <label for="startDate"
+                       class="block text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">开始时间范围:</label>
                 <input type="datetime-local" id="startDate"
-                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                       class="shadow border rounded w-full py-2 px-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:shadow-outline">
             </div>
             <div>
-                <label for="endDate" class="block text-gray-700 text-sm font-bold mb-2">结束时间范围:</label>
+                <label for="endDate"
+                       class="block text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">结束时间范围:</label>
                 <input type="datetime-local" id="endDate"
-                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                       class="shadow border rounded w-full py-2 px-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:shadow-outline">
             </div>
-
             <div>
-                <label for="timeInterval" class="block text-gray-700 text-sm font-bold mb-2">时间间隔:</label>
+                <label for="timeInterval"
+                       class="block text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">时间间隔:</label>
                 <select id="timeInterval"
-                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        class="shadow border rounded w-full py-2 px-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:shadow-outline">
                     <option value="5m">5 分钟</option>
-                    <option value="15m">15 分钟</option> <!-- 稍后JS会设置这个为默认 -->
+                    <option value="15m">15 分钟</option>
                     <option value="30m">30 分钟</option>
                     <option value="60m">1 小时</option>
                     <option value="120m">2 小时</option>
@@ -66,22 +77,20 @@
                     <option value="168h">7 天</option>
                 </select>
             </div>
-
             <div>
-                <label for="compareOffset" class="block text-gray-700 text-sm font-bold mb-2">对比偏移:</label>
+                <label for="compareOffset"
+                       class="block text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">对比偏移:</label>
                 <div class="flex gap-2">
                     <input type="number" id="compareOffset" value="0" min="0"
-                           class="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline w-24"
+                           class="shadow border rounded py-2 px-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:shadow-outline w-24"
                            placeholder="0 表示不对比">
                     <select id="compareUnit"
-                            class="shadow appearance-none border rounded py-2 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            class="shadow border rounded py-2 px-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:shadow-outline">
                         <option value="hours">小时</option>
-                        <option value="days">天</option> <!-- 稍后JS会设置这个为默认 -->
+                        <option value="days">天</option>
                     </select>
                 </div>
             </div>
-
-
             <div>
                 <button id="fetchData"
                         class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
@@ -90,11 +99,51 @@
             </div>
         </div>
 
-
-        <canvas id="timeSeriesChart" aria-label="发帖量统计" role="img"></canvas>
+        <canvas id="timeSeriesChart" aria-label="发帖量统计" role="img"
+                class="bg-white dark:bg-gray-800 rounded shadow"></canvas>
     </div>
-
 </div>
+
+<script data-cfasync="false">
+    const toggleBtn = document.getElementById('toggleDark');
+    const themeIcon = document.getElementById('themeIcon');
+
+    // 切换函数
+    function updateThemeIcon(isDark) {
+        themeIcon.textContent = isDark ? '🌙' : '☀';
+        themeIcon.title = isDark? '切换到浅色模式' : '切换到深色模式';
+        toggleBtn.title = isDark? '切换到浅色模式' : '切换到深色模式';
+    }
+
+    toggleBtn.addEventListener('click', () => {
+        const isDark = document.documentElement.classList.toggle('dark');
+        sessionStorage.setItem('theme', isDark ? 'dark' : 'light');
+        updateThemeIcon(isDark);
+    });
+
+    // 初始化主题
+    function applyTheme() {
+        const savedTheme = sessionStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const useDark = savedTheme === 'dark' || (!savedTheme && systemPrefersDark);
+
+        document.documentElement.classList.toggle('dark', useDark);
+        updateThemeIcon(useDark);
+    }
+
+    // 初始执行
+    applyTheme();
+
+    // 监听系统主题变化（如果用户没有手动设置过）
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        const savedTheme = sessionStorage.getItem('theme');
+        if (!savedTheme) {
+            document.documentElement.classList.toggle('dark', e.matches);
+            updateThemeIcon(e.matches);
+        }
+    });
+
+</script>
 
 <script>
     const ctx = document.getElementById('timeSeriesChart').getContext('2d');
