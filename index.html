@@ -240,10 +240,10 @@
 
             Promise.all([
                 fetchData(startDateUTC, endDateUTC, timeInterval),
-                // 只有在需要对比且对比时间有效时才获取对比数据
+                // 只有在需要对比且对比时间有效时才获取对比发帖量
                 (compareOffset > 0 && startCompareUTC && endCompareUTC)
                     ? fetchData(startCompareUTC, endCompareUTC, timeInterval)
-                    : Promise.resolve(null) // 返回 null 表示没有对比数据
+                    : Promise.resolve(null) // 返回 null 表示没有对比发帖量
             ]).then(([currentData, compareData]) => {
                 // --- 数据处理和图表更新 ---
                 if (!currentData || !Array.isArray(currentData)) {
@@ -254,7 +254,7 @@
                 const labels = currentData.map(item => fromUTC(item.timestamp));
                 const datasets = [
                     {
-                        label: '当前数据',
+                        label: '当前发帖量',
                         data: currentData.map(item => item.value),
                         borderColor: 'rgb(75, 192, 192)',
                         tension: 0.1,
@@ -263,13 +263,13 @@
                     }
                 ];
 
-                // 对比数据 (只有在成功获取后才添加)
+                // 对比发帖量 (只有在成功获取后才添加)
                 if (compareData && Array.isArray(compareData) && compareData.length > 0) {
-                    // 重要: 确保对比数据的时间戳数量与主数据匹配或进行对齐处理
+                    // 重要: 确保对比发帖量的时间戳数量与主数据匹配或进行对齐处理
                     // 简单处理：假设API返回的数据点数和时间间隔一致
                     if (compareData.length === currentData.length) {
                         datasets.push({
-                            label: `对比数据 (${compareOffset}${compareUnit === 'days' ? '天' : '小时'}前)`,
+                            label: `对比发帖量 (${compareOffset}${compareUnit === 'days' ? '天' : '小时'}前)`,
                             data: compareData.map(item => item.value),
                             borderColor: 'rgb(255, 99, 132)',
                             tension: 0.1,
@@ -278,10 +278,10 @@
                             borderDash: [5, 5] // <--- 添加这一行使对比线变成虚线
                         });
                     } else {
-                        console.warn("对比数据的点数与主数据不匹配，可能导致图表错位。主数据点数:", currentData.length, "对比数据点数:", compareData.length);
-                        // 可以选择不显示对比数据或尝试更复杂的对齐逻辑
+                        console.warn("对比发帖量的点数与主数据不匹配，可能导致图表错位。主数据点数:", currentData.length, "对比发帖量点数:", compareData.length);
+                        // 可以选择不显示对比发帖量或尝试更复杂的对齐逻辑
                         datasets.push({
-                            label: `对比数据 (${compareOffset}${compareUnit === 'days' ? '天' : '小时'}前) - 数据点不匹配`,
+                            label: `对比发帖量 (${compareOffset}${compareUnit === 'days' ? '天' : '小时'}前) - 数据点不匹配`,
                             data: [], // Or try aligning based on timestamps if possible
                             borderColor: 'rgb(255, 99, 132)',
                             borderDash: [5, 5], // 保持虚线提示
@@ -289,9 +289,9 @@
                         });
                     }
                 } else if (compareOffset > 0 && !compareData) {
-                    console.warn("请求了对比数据，但未能获取或数据为空。");
+                    console.warn("请求了对比发帖量，但未能获取或数据为空。");
                     datasets.push({
-                        label: `对比数据 (${compareOffset}${compareUnit === 'days' ? '天' : '小时'}前) - 获取失败`,
+                        label: `对比发帖量 (${compareOffset}${compareUnit === 'days' ? '天' : '小时'}前) - 获取失败`,
                         data: [],
                         borderColor: 'rgb(255, 99, 132)',
                         borderDash: [5, 5], // 保持虚线提示
