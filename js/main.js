@@ -2,6 +2,7 @@ import { ThemeManager } from './theme.js';
 import { ChartManager } from './chart.js';
 import { dateUtils } from './dateUtils.js';
 import { api } from './api.js';
+import { IndicatorHandler } from './indicators.js';
 
 class App {
     constructor() {
@@ -124,11 +125,7 @@ class App {
 
         // 添加技术指标
         if (selectedIndicator && currentData[0] && selectedIndicator in currentData[0]) {
-            if (selectedIndicator === 'boll') {
-                this.addBollDatasets(datasets, currentData);
-            } else {
-                this.addIndicatorDataset(datasets, currentData, selectedIndicator);
-            }
+            IndicatorHandler.process(selectedIndicator, datasets, currentData);
         }
 
         // 添加对比数据
@@ -139,36 +136,7 @@ class App {
         this.chartManager.updateChart(labels, datasets);
     }
 
-    addBollDatasets(datasets, currentData) {
-        const bollColors = {
-            upper: 'rgba(234,222,119,0.75)',
-            lower: 'rgba(217,141,234,0.75)',
-            middle: 'rgba(198,214,212,0.59)'
-        };
-
-        ['upper', 'lower', 'middle'].forEach(line => {
-            datasets.push({
-                label: line.toUpperCase(),
-                data: currentData.map(item => item.boll[line]),
-                borderColor: bollColors[line],
-                borderWidth: 1,
-                tension: 0.1,
-                pointRadius: 1,
-                pointHoverRadius: 5
-            });
-        });
-    }
-
-    addIndicatorDataset(datasets, currentData, indicator) {
-        datasets.push({
-            label: indicator.toUpperCase(),
-            data: currentData.map(item => item[indicator]),
-            borderColor: 'rgb(255, 159, 64)',
-            tension: 0.1,
-            pointRadius: 1,
-            pointHoverRadius: 5
-        });
-    }
+    // 删除原来的 addBollDatasets 和 addIndicatorDataset 方法，因为已经移到 IndicatorHandler 中了
 
     addCompareDataset(datasets, compareData, currentData, compareOffset, compareUnit) {
         if (compareData.length === currentData.length) {
