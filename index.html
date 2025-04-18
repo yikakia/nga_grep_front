@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>大时代景气指数</title>
+    <!-- CDN 资源 -->
     <script src="https://cdn.tailwindcss.com" data-cfasync="false"></script>
     <script data-cfasync="false">
         tailwind.config = {
@@ -16,478 +17,120 @@
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-8M3SQNFGV5"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
-
-        function gtag() {
-            dataLayer.push(arguments);
-        }
-
+        function gtag() { dataLayer.push(arguments); }
         gtag('js', new Date());
         gtag('config', 'G-8M3SQNFGV5');
     </script>
+
+    <!-- 加载主应用脚本 -->
+    <script type="module" src="js/main.js"></script>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-<div class="container mx-auto p-4">
-    <!-- 深色模式切换按钮 -->
-    <div class="flex justify-end mb-4">
-        <button id="toggleDark"
-                class="flex items-center gap-1 px-3 py-2 rounded bg-gray-200 dark:bg-gray-700 dark:text-white relative"
-                title="切换到浅色模式">
-            <span id="themeIcon">☀</span>
-        </button>
-    </div>
-
-    <div class="w-full max-w-6xl mx-auto h-[300px] sm:h-[350px] md:h-[400px] lg:h-[500px]">
-        <h1 class="text-2xl font-bold mb-4">大时代景气指数(NGA:706)</h1>
-        <div class="flex flex-wrap items-center gap-4 mb-4">
-            <div>
-                <label for="indicatorSelect"
-                       class="block text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">选择指标:</label>
-                <select id="indicatorSelect"
-                        class="shadow border rounded py-2 px-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:shadow-outline">
-                    <option value="">环比</option>
-                    <option value="ma5">MA5</option>
-                    <option value="ma10">MA10</option>
-                    <option value="boll">BOLL</option>
-                    <!--                    <option value="macd">MACD</option>-->
-                </select>
-            </div>
-            <div>
-                <label for="rangeSelect"
-                       class="block text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">快速选择:</label>
-                <select id="rangeSelect"
-                        class="shadow border rounded w-full py-2 px-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:shadow-outline">
-                    <option value="2h">最近2小时</option>
-                    <option value="8h">最近8小时</option>
-                    <option value="24h">最近24小时</option>
-                    <option value="3d">最近3天</option>
-                    <option value="5d">最近5天</option>
-                    <option value="7d">最近7天</option>
-                    <option value="14d">最近14天</option>
-                    <option value="30d">最近30天</option>
-                </select>
-            </div>
-            <div>
-                <label for="startDate"
-                       class="block text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">开始时间范围:</label>
-                <input type="datetime-local" id="startDate"
-                       class="shadow border rounded w-full py-2 px-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:shadow-outline">
-            </div>
-            <div>
-                <label for="endDate"
-                       class="block text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">结束时间范围:</label>
-                <input type="datetime-local" id="endDate"
-                       class="shadow border rounded w-full py-2 px-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:shadow-outline">
-            </div>
-            <div>
-                <label for="timeInterval"
-                       class="block text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">时间间隔:</label>
-                <select id="timeInterval"
-                        class="shadow border rounded w-full py-2 px-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:shadow-outline">
-                    <option value="5m">5 分钟</option>
-                    <option value="15m">15 分钟</option>
-                    <option value="30m">30 分钟</option>
-                    <option value="1h">1 小时</option>
-                    <option value="4h">4 小时</option>
-                    <option value="12h">12 小时</option>
-                    <option value="24h">1 天</option>
-                    <option value="168h">7 天</option>
-                </select>
-            </div>
-            <div>
-                <label for="compareOffset"
-                       class="block text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">环比偏移:</label>
-                <div class="flex gap-2">
-                    <input type="number" id="compareOffset" value="0" min="0"
-                           class="shadow border rounded py-2 px-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:shadow-outline w-24">
-                    <select id="compareUnit"
-                            class="shadow border rounded py-2 px-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:shadow-outline">
-                        <option value="hours">小时</option>
-                        <option value="days">天</option>
-                    </select>
-                </div>
-            </div>
-            <div>
-                <button id="fetchData"
-                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                    查询
-                </button>
-            </div>
+    <div class="container mx-auto p-4">
+        <!-- 深色模式切换按钮 -->
+        <div class="flex justify-end mb-4">
+            <button id="toggleDark"
+                    class="flex items-center gap-1 px-3 py-2 rounded bg-gray-200 dark:bg-gray-700 dark:text-white relative"
+                    title="切换到浅色模式">
+                <span id="themeIcon">☀</span>
+            </button>
         </div>
 
-        <canvas id="timeSeriesChart" aria-label="发帖量统计" role="img"
-                class="bg-white dark:bg-gray-800 rounded shadow"></canvas>
+        <div class="w-full max-w-6xl mx-auto h-[300px] sm:h-[350px] md:h-[400px] lg:h-[500px]">
+            <h1 class="text-2xl font-bold mb-4">大时代景气指数(NGA:706)</h1>
+            
+            <!-- 控制面板 -->
+            <div class="flex flex-wrap items-center gap-4 mb-4">
+                <!-- 指标选择 -->
+                <div>
+                    <label for="indicatorSelect" class="block text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">
+                        选择指标:
+                    </label>
+                    <select id="indicatorSelect" class="shadow border rounded py-2 px-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:shadow-outline">
+                        <option value="">环比</option>
+                        <option value="ma5">MA5</option>
+                        <option value="ma10">MA10</option>
+                        <option value="boll">BOLL</option>
+                    </select>
+                </div>
+
+                <!-- 快速选择 -->
+                <div>
+                    <label for="rangeSelect" class="block text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">
+                        快速选择:
+                    </label>
+                    <select id="rangeSelect" class="shadow border rounded w-full py-2 px-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:shadow-outline">
+                        <option value="2h">最近2小时</option>
+                        <option value="8h">最近8小时</option>
+                        <option value="24h">最近24小时</option>
+                        <option value="3d">最近3天</option>
+                        <option value="5d">最近5天</option>
+                        <option value="7d">最近7天</option>
+                        <option value="14d">最近14天</option>
+                        <option value="30d">最近30天</option>
+                    </select>
+                </div>
+
+                <!-- 时间范围选择 -->
+                <div>
+                    <label for="startDate" class="block text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">
+                        开始时间范围:
+                    </label>
+                    <input type="datetime-local" id="startDate" class="shadow border rounded w-full py-2 px-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:shadow-outline">
+                </div>
+
+                <div>
+                    <label for="endDate" class="block text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">
+                        结束时间范围:
+                    </label>
+                    <input type="datetime-local" id="endDate" class="shadow border rounded w-full py-2 px-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:shadow-outline">
+                </div>
+
+                <!-- 时间间隔 -->
+                <div>
+                    <label for="timeInterval" class="block text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">
+                        时间间隔:
+                    </label>
+                    <select id="timeInterval" class="shadow border rounded w-full py-2 px-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:shadow-outline">
+                        <option value="5m">5 分钟</option>
+                        <option value="15m">15 分钟</option>
+                        <option value="30m">30 分钟</option>
+                        <option value="1h">1 小时</option>
+                        <option value="4h">4 小时</option>
+                        <option value="12h">12 小时</option>
+                        <option value="24h">1 天</option>
+                        <option value="168h">7 天</option>
+                    </select>
+                </div>
+
+                <!-- 环比偏移 -->
+                <div>
+                    <label for="compareOffset" class="block text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">
+                        环比偏移:
+                    </label>
+                    <div class="flex gap-2">
+                        <input type="number" id="compareOffset" value="0" min="0" class="shadow border rounded py-2 px-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:shadow-outline w-24">
+                        <select id="compareUnit" class="shadow border rounded py-2 px-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:shadow-outline">
+                            <option value="hours">小时</option>
+                            <option value="days">天</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 查询按钮 -->
+                <div>
+                    <button id="fetchData" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                        查询
+                    </button>
+                </div>
+            </div>
+
+            <!-- 图表容器 -->
+            <canvas id="timeSeriesChart" aria-label="发帖量统计" role="img" class="bg-white dark:bg-gray-800 rounded shadow"></canvas>
+        </div>
+
+        <!-- Toast 提示组件 -->
+        <div id="toast" class="hidden fixed bottom-4 right-4 px-4 py-2 rounded shadow-lg transition-opacity duration-300"></div>
     </div>
-</div>
-
-<script data-cfasync="false">
-    const toggleBtn = document.getElementById('toggleDark');
-    const themeIcon = document.getElementById('themeIcon');
-
-    // 切换函数
-    function updateThemeIcon(isDark) {
-        themeIcon.textContent = isDark ? '🌙' : '☀';
-        themeIcon.title = isDark ? '切换到浅色模式' : '切换到深色模式';
-        toggleBtn.title = isDark ? '切换到浅色模式' : '切换到深色模式';
-    }
-
-    toggleBtn.addEventListener('click', () => {
-        const isDark = document.documentElement.classList.toggle('dark');
-        sessionStorage.setItem('theme', isDark ? 'dark' : 'light');
-        updateThemeIcon(isDark);
-    });
-
-    // 初始化主题
-    function applyTheme() {
-        const savedTheme = sessionStorage.getItem('theme');
-        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const useDark = savedTheme === 'dark' || (!savedTheme && systemPrefersDark);
-
-        document.documentElement.classList.toggle('dark', useDark);
-        updateThemeIcon(useDark);
-    }
-
-    // 初始执行
-    applyTheme();
-
-    // 监听系统主题变化（如果用户没有手动设置过）
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-        const savedTheme = sessionStorage.getItem('theme');
-        if (!savedTheme) {
-            document.documentElement.classList.toggle('dark', e.matches);
-            updateThemeIcon(e.matches);
-        }
-    });
-
-</script>
-
-<script>
-    const ctx = document.getElementById('timeSeriesChart').getContext('2d');
-    let chart;
-
-    function toUTC(dateString) {
-        // Handle potential empty string or invalid date input gracefully
-        if (!dateString) return null;
-        const m = moment(dateString);
-        return m.isValid() ? m.utc().format('YYYY-MM-DD HH:mm') : null;
-    }
-
-    function fromUTC(utcTimestamp) {
-        return moment.utc(utcTimestamp).local().format('YYYY-MM-DD HH:mm');
-    }
-
-    function fetchData(startDateUTC, endDateUTC, timeInterval, indicator) { // 修改 fetchData 函数，添加 indicator 参数
-        // Add validation for parameters
-        if (!startDateUTC || !endDateUTC || !timeInterval) {
-            return Promise.reject(new Error("无效的查询参数"));
-        }
-        // let url = `http://localhost:11648/api/timeseries?startDate=${startDateUTC}&endDate=${endDateUTC}&timeInterval=${timeInterval}`;
-        let url = `https://nga_grep.yikakia.com/api/timeseries?startDate=${startDateUTC}&endDate=${endDateUTC}&timeInterval=${timeInterval}`;
-        if (indicator) { // 如果选择了指标，则添加到 URL 中
-            url += `&indicator=${indicator}`;
-        }
-        console.log("Fetching data from:", url); // Log URL for debugging
-        return fetch(url).then(res => {
-            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-            return res.json();
-        });
-    }
-
-    function updateChart(labels, datasets) {
-        if (chart) chart.destroy();
-
-        chart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: datasets // 使用传入的 datasets
-            },
-            options: {
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: '时间 (本地时间)' // Clarify timezone
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: '数值' // 修改 Y 轴标题为 '数值'，因为可能包含指标
-                        },
-                        beginAtZero: true // Often useful for counts
-                    }
-                },
-                plugins: {
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false,
-                    }
-                },
-                interaction: { // Improve hover performance
-                    mode: 'nearest',
-                    axis: 'x',
-                    intersect: false
-                },
-                responsive: true,
-                maintainAspectRatio: false // Or false depending on layout needs
-            }
-        });
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        // --- 获取 DOM 元素的引用 ---
-        const startDateInput = document.getElementById('startDate');
-        const endDateInput = document.getElementById('endDate');
-        const fetchDataButton = document.getElementById('fetchData');
-        const timeIntervalSelect = document.getElementById('timeInterval');
-        const rangeSelect = document.getElementById('rangeSelect');
-        const compareOffsetInput = document.getElementById('compareOffset');
-        const compareUnitSelect = document.getElementById('compareUnit');
-        const indicatorSelect = document.getElementById('indicatorSelect');
-
-
-        function setDateRange(range) {
-            const now = moment();
-            const rangeOptions = {
-                '2h': {value: 2, unit: 'hours'},
-                '8h': {value: 8, unit: 'hours'},
-                '24h': {value: 24, unit: 'hours'},
-                '3d': {value: 3, unit: 'days'},
-                '5d': {value: 5, unit: 'days'},
-                '7d': {value: 7, unit: 'days'},
-                '14d': {value: 14, unit: 'days'},
-                '30d': {value: 30, unit: 'days'}
-            };
-            const option = rangeOptions[range];
-            if (!option) {
-                console.warn("未知的快速选择范围:", range);
-                return;
-            }
-            const start = moment().subtract(option.value, option.unit);
-
-            // 使用 moment().local() 确保输入框显示的是本地时间
-            startDateInput.value = start.local().format('YYYY-MM-DDTHH:mm');
-            endDateInput.value = now.local().format('YYYY-MM-DDTHH:mm');
-        }
-
-        function pushBoll(datasets, currentData, selectedIndicator) {
-            datasets.push(
-                {
-                    label: 'UPPER',
-                    data: currentData.map(item => item['boll']['upper']),
-                    borderColor: 'rgba(234,222,119,0.75)',
-                    borderWidth: 1,
-                    tension: 0.1,
-                    pointRadius: 1,
-                    pointHoverRadius: 5
-                }
-            )
-            datasets.push(
-                {
-                    label: 'LOWER',
-                    data: currentData.map(item => item['boll']['lower']),
-                    borderColor: 'rgba(217,141,234,0.75)',
-                    borderWidth: 1,
-                    tension: 0.1,
-                    pointRadius: 1,
-                    pointHoverRadius: 5
-                }
-            )
-            datasets.push(
-                {
-                    label: 'BOLL',
-                    data: currentData.map(item => item['boll']['middle']),
-                    borderColor: 'rgba(198,214,212,0.59)',
-                    borderWidth: 1,
-                    tension: 0.1,
-                    pointRadius: 1,
-                    pointHoverRadius: 5
-                }
-            )
-        }
-
-        // --- 事件监听器：快速选择变化 ---
-        rangeSelect.addEventListener('change', () => {
-            setDateRange(rangeSelect.value);
-            // 当快速选择改变时，自动触发查询
-            fetchDataButton.click();
-        });
-
-        // 监听技术指标
-        indicatorSelect.addEventListener('change', () => {
-            const value = indicatorSelect.value;
-            const disableCompare = value !== "";
-            compareOffsetInput.disabled = disableCompare;
-            compareUnitSelect.disabled = disableCompare;
-            // 当指标选择改变时，自动触发查询
-            fetchDataButton.click();
-        });
-
-        // --- 事件监听器：点击查询按钮 ---
-        fetchDataButton.addEventListener('click', () => {
-            const startDateLocal = startDateInput.value;
-            const endDateLocal = endDateInput.value;
-            const timeInterval = timeIntervalSelect.value;
-            const compareOffset = parseInt(compareOffsetInput.value) || 0;
-            const compareUnit = compareUnitSelect.value; // Use correct variable name
-            const selectedIndicator = indicatorSelect.value; // 获取选中的指标
-
-            const startDateUTC = toUTC(startDateLocal);
-            const endDateUTC = toUTC(endDateLocal);
-
-            // --- 输入验证 ---
-            if (!startDateUTC || !endDateUTC) {
-                alert("请输入有效的开始和结束时间！");
-                return;
-            }
-            if (moment(endDateLocal).isBefore(moment(startDateLocal))) {
-                alert("结束时间不能早于开始时间！");
-                return;
-            }
-
-            // 计算对比时间范围 (确保是 UTC)
-            let startCompareUTC = null;
-            let endCompareUTC = null;
-            if (compareOffset > 0 && !selectedIndicator) { // 只有在没有选择指标时才进行对比偏移
-                const startMomentUTC = moment.utc(startDateUTC);
-                const endMomentUTC = moment.utc(endDateUTC);
-                if (startMomentUTC.isValid() && endMomentUTC.isValid()) {
-                    startCompareUTC = startMomentUTC.subtract(compareOffset, compareUnit).format('YYYY-MM-DD HH:mm');
-                    endCompareUTC = endMomentUTC.subtract(compareOffset, compareUnit).format('YYYY-MM-DD HH:mm');
-                } else {
-                    console.error("无法计算对比时间，原始时间无效。");
-                    alert("无法计算对比时间，请检查输入的原始时间。");
-                    return; // Stop if base dates are invalid for comparison calc
-                }
-            }
-
-            fetchDataButton.disabled = true;
-            fetchDataButton.textContent = "查询中...";
-            // Consider adding a loading spinner overlay on the chart
-
-
-            Promise.all([
-                fetchData(startDateUTC, endDateUTC, timeInterval, selectedIndicator), // 传递 selectedIndicator 给 fetchData
-                // 只有在需要对比且对比时间有效 **且没有选择指标** 时才获取对比发帖量
-                (compareOffset > 0 && startCompareUTC && endCompareUTC && !selectedIndicator)
-                    ? fetchData(startCompareUTC, endCompareUTC, timeInterval, null) // 对比数据不需要指标
-                    : Promise.resolve(null) // 返回 null 表示没有对比发帖量
-            ]).then(([currentData, compareData]) => {
-                // --- 数据处理和图表更新 ---
-                if (!currentData || !Array.isArray(currentData)) {
-                    throw new Error("主数据格式无效");
-                }
-
-                // 数据集数组
-                const datasets = [];
-
-                // 主数据 - 发帖量
-                const labels = currentData.map(item => fromUTC(item.timestamp));
-                datasets.push({
-                    label: '当前发帖量',
-                    data: currentData.map(item => item.value),
-                    borderColor: 'rgb(75, 192, 192)',
-                    tension: 0.1,
-                    pointRadius: 1, // Smaller points for dense data
-                    pointHoverRadius: 5
-                });
-
-                // 技术指标数据
-                if (selectedIndicator && currentData[0] && selectedIndicator in currentData[0]) {
-                    // boll 有多根，单独处理
-                    if (selectedIndicator === 'boll') {
-                        pushBoll(datasets, currentData, selectedIndicator);
-                    } else {
-                        datasets.push({
-                            label: selectedIndicator.toUpperCase(), // 指标名称作为 label
-                            data: currentData.map(item => item[selectedIndicator]), // 从数据中获取指标值
-                            borderColor: 'rgb(255, 159, 64)', // 指标线条颜色
-                            tension: 0.1,
-                            pointRadius: 1,
-                            pointHoverRadius: 5
-                        });
-                    }
-                }
-
-
-                // 对比发帖量 (只有在成功获取后才添加)
-                if (compareData && Array.isArray(compareData) && compareData.length > 0) {
-                    // 重要: 确保对比发帖量的时间戳数量与主数据匹配或进行对齐处理
-                    // 简单处理：假设API返回的数据点数和时间间隔一致
-                    if (compareData.length === currentData.length) {
-                        datasets.push({
-                            label: `对比发帖量 (${compareOffset}${compareUnit === 'days' ? '天' : '小时'}前)`,
-                            data: compareData.map(item => item.value),
-                            borderColor: 'rgb(255, 99, 132)',
-                            tension: 0.1,
-                            pointRadius: 1,
-                            pointHoverRadius: 5,
-                            borderDash: [5, 5] // <--- 添加这一行使对比线变成虚线
-                        });
-                    } else {
-                        console.warn("对比发帖量的点数与主数据不匹配，可能导致图表错位。主数据点数:", currentData.length, "对比发帖量点数:", compareData.length);
-                        // 可以选择不显示对比发帖量或尝试更复杂的对齐逻辑
-                        datasets.push({
-                            label: `对比发帖量 (${compareOffset}${compareUnit === 'days' ? '天' : '小时'}前) - 数据点不匹配`,
-                            data: [], // Or try aligning based on timestamps if possible
-                            borderColor: 'rgb(255, 99, 132)',
-                            borderDash: [5, 5], // 保持虚线提示
-                            tension: 0.1
-                        });
-                    }
-                } else if (compareOffset > 0 && !compareData && !selectedIndicator) { // 只有在请求对比且失败 **且没有选择指标** 时显示提示
-                    console.warn("请求了对比发帖量，但未能获取或数据为空。");
-                    datasets.push({
-                        label: `对比发帖量 (${compareOffset}${compareUnit === 'days' ? '天' : '小时'}前) - 获取失败`,
-                        data: [],
-                        borderColor: 'rgb(255, 99, 132)',
-                        borderDash: [5, 5], // 保持虚线提示
-                        tension: 0.1
-                    });
-                }
-                // **** 修改结束 ****
-
-                updateChart(labels, datasets); // 将构建好的 datasets 传递给 updateChart
-
-            }).catch(err => {
-                console.error("数据获取或处理失败:", err);
-                alert(`获取数据失败: ${err.message}。请检查网络或控制台日志。`);
-                if (chart) chart.destroy();
-                ctx.fillText("加载数据出错", 10, 50); // Simple error message on canvas
-
-            }).finally(() => {
-                // --- 恢复按钮状态 ---
-                fetchDataButton.disabled = false;
-                fetchDataButton.textContent = "查询";
-            });
-        });
-
-        // --- 初始化默认值 ---
-        console.log("Setting initial default values...");
-
-        // 1. 设置默认快速选择为 "最近24小时"
-        rangeSelect.value = '24h';
-
-        // 2. 设置默认时间间隔为 "15分钟"
-        timeIntervalSelect.value = '15m';
-
-        // 3. 根据默认的 "最近24小时" 设置开始和结束时间输入框
-        const now = moment();
-        const twentyFourHoursAgo = moment().subtract(24, 'hours');
-        startDateInput.value = twentyFourHoursAgo.local().format('YYYY-MM-DDTHH:mm');
-        endDateInput.value = now.local().format('YYYY-MM-DDTHH:mm');
-        compareUnitSelect.value = 'days'; // 默认对比单位为天
-
-        console.log("Initial Start Date (Local):", startDateInput.value);
-        console.log("Initial End Date (Local):", endDateInput.value);
-        console.log("Initial Time Interval:", timeIntervalSelect.value);
-        console.log("Initial Range Select:", rangeSelect.value);
-        console.log("Initial compareUnit:", compareUnitSelect.value);
-
-        console.log("Triggering initial data fetch...");
-        fetchDataButton.click(); // 触发初始查询
-    });
-</script>
-
 </body>
 </html>
