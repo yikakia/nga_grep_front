@@ -38,7 +38,7 @@ export class IndicatorHandler {
                 datasets.push({
                     label: 'MA10',
                     data: currentData.map(item => item.ma10),
-                    borderColor: 'rgb(75, 192, 192)',
+                    borderColor: 'rgb(255, 159, 64)',
                     tension: 0.1,
                     pointRadius: 1,
                     pointHoverRadius: 5

@@ -58,18 +58,19 @@ class App {
 
         if (!this.validateInputs(startDateUTC, endDateUTC)) return;
 
-        const compareData = await this.getCompareData(startDateUTC, endDateUTC, compareOffset, compareUnit, timeInterval, selectedIndicator);
+        const compareResult = await this.getCompareResp(startDateUTC, endDateUTC, compareOffset, compareUnit, timeInterval, selectedIndicator);
         
         try {
             this.fetchDataButton.disabled = true;
             this.fetchDataButton.textContent = "查询中...";
 
-            const [currentData, compareResult] = await Promise.all([
+            const [currentResp, compareResp] = await Promise.all([
                 api.fetchData(startDateUTC, endDateUTC, timeInterval, selectedIndicator),
-                compareData
+                compareResult,
+                // this.getCompareResp(startDateUTC, endDateUTC, compareOffset, compareUnit, timeInterval, selectedIndicator)
             ]);
 
-            this.updateChartData(currentData, compareResult, compareOffset, compareUnit, selectedIndicator);
+            this.updateChartData(currentResp, compareResp, compareOffset, compareUnit, selectedIndicator);
         } catch (err) {
             console.error("数据获取或处理失败:", err);
             alert(`获取数据失败: ${err.message}。请检查网络或控制台日志。`);
@@ -92,7 +93,7 @@ class App {
         return true;
     }
 
-    async getCompareData(startDateUTC, endDateUTC, compareOffset, compareUnit, timeInterval, selectedIndicator) {
+    async getCompareResp(startDateUTC, endDateUTC, compareOffset, compareUnit, timeInterval, selectedIndicator) {
         if (compareOffset > 0 && !selectedIndicator) {
             const startMomentUTC = moment.utc(startDateUTC);
             const endMomentUTC = moment.utc(endDateUTC);
@@ -105,10 +106,11 @@ class App {
         return Promise.resolve(null);
     }
 
-    updateChartData(currentData, compareData, compareOffset, compareUnit, selectedIndicator) {
-        if (!currentData || !Array.isArray(currentData)) {
+    updateChartData(currentResp, compareResp, compareOffset, compareUnit, selectedIndicator) {
+        if (!currentResp ||!currentResp['data'] || !Array.isArray(currentResp['data'])) {
             throw new Error("主数据格式无效");
         }
+        const currentData = currentResp['data'] ;
 
         const datasets = [];
         const labels = currentData.map(item => dateUtils.fromUTC(item.timestamp));
@@ -129,14 +131,12 @@ class App {
         }
 
         // 添加对比数据
-        if (compareData && Array.isArray(compareData) && compareData.length > 0) {
-            this.addCompareDataset(datasets, compareData, currentData, compareOffset, compareUnit);
+        if (compareResp &&compareResp['data'] && Array.isArray(compareResp['data']) && compareResp['data'].length > 0) {
+            this.addCompareDataset(datasets, compareResp['data'], currentData, compareOffset, compareUnit);
         }
 
         this.chartManager.updateChart(labels, datasets);
     }
-
-    // 删除原来的 addBollDatasets 和 addIndicatorDataset 方法，因为已经移到 IndicatorHandler 中了
 
     addCompareDataset(datasets, compareData, currentData, compareOffset, compareUnit) {
         if (compareData.length === currentData.length) {

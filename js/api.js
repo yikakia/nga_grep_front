@@ -5,6 +5,7 @@ export const api = {
         }
 
         let url = `https://nga_grep.yikakia.com/api/timeseries?startDate=${startDateUTC}&endDate=${endDateUTC}&timeInterval=${timeInterval}`;
+        // let url = `http://localhost:11648/api/timeseries?startDate=${startDateUTC}&endDate=${endDateUTC}&timeInterval=${timeInterval}`;
         if (indicator) {
             url += `&indicator=${indicator}`;
         }
