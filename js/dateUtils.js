@@ -19,7 +19,8 @@ export const dateUtils = {
             '5d': {value: 5, unit: 'days'},
             '7d': {value: 7, unit: 'days'},
             '14d': {value: 14, unit: 'days'},
-            '30d': {value: 30, unit: 'days'}
+            '30d': {value: 30, unit: 'days'},
+            '60d': {value: 60, unit: 'days'},
         };
 
         const option = rangeOptions[range];
