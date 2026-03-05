@@ -8,6 +8,7 @@
     <!-- CDN 资源 -->
     <!-- <script src="https://cdn.tailwindcss.com" data-cfasync="false"></script> -->
     <link href="./output.css" rel="stylesheet">
+    <link href="./styles/custom.css" rel="stylesheet">
     <script data-cfasync="false">
         tailwind.config = {
             darkMode: 'class',
@@ -28,27 +29,25 @@
     <script type="module" src="dist/bundle.js"></script>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-    <div class="container mx-auto p-4">
-        <!-- 深色模式切换按钮 -->
-        <div class="flex justify-end mb-4">
-            <button id="toggleDark"
-                    class="flex items-center gap-1 px-3 py-2 rounded bg-gray-200 dark:bg-gray-700 dark:text-white relative"
-                    title="切换到浅色模式">
+    <div class="container mx-auto p-4 dashboard-shell">
+        <header class="panel-card panel-header">
+            <div>
+                <h1 class="panel-title">大时代景气指数 (NGA:706)</h1>
+                <p class="panel-subtitle">单屏控制面板与趋势图联动展示，支持快速区间、精确时间段与指标叠加查询。</p>
+            </div>
+            <button id="toggleDark" class="theme-toggle-btn" title="切换到浅色模式">
                 <span id="themeIcon">☀</span>
             </button>
-        </div>
+        </header>
 
-        <div class="w-full max-w-6xl mx-auto h-[300px] sm:h-[350px] md:h-[400px] lg:h-[500px]">
-            <h1 class="text-2xl font-bold mb-4">大时代景气指数(NGA:706)</h1>
-            
-            <!-- 控制面板 -->
-            <div class="flex flex-wrap items-center gap-4 mb-4">
-                <!-- 指标选择 -->
-                <div>
-                    <label for="indicatorSelect" class="block text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">
-                        选择指标:
-                    </label>
-                    <select id="indicatorSelect" class="shadow border rounded py-2 px-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:shadow-outline">
+        <section class="panel-card panel-controls" aria-label="查询控制区">
+            <h2 class="panel-section-title">查询条件</h2>
+            <p class="panel-section-subtitle">先选择范围与间隔，再点击查询刷新图表。环比偏移仅在“环比”模式下生效。</p>
+
+            <div class="controls-grid">
+                <div class="control-group">
+                    <label for="indicatorSelect" class="control-label">选择指标</label>
+                    <select id="indicatorSelect" class="control-input">
                         <option value="">环比</option>
                         <option value="ma5">MA5</option>
                         <option value="ma10">MA10</option>
@@ -56,12 +55,9 @@
                     </select>
                 </div>
 
-                <!-- 快速选择 -->
-                <div>
-                    <label for="rangeSelect" class="block text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">
-                        快速选择:
-                    </label>
-                    <select id="rangeSelect" class="shadow border rounded w-full py-2 px-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:shadow-outline">
+                <div class="control-group">
+                    <label for="rangeSelect" class="control-label">快速选择</label>
+                    <select id="rangeSelect" class="control-input">
                         <option value="2h">最近2小时</option>
                         <option value="8h">最近8小时</option>
                         <option value="24h">最近24小时</option>
@@ -74,27 +70,19 @@
                     </select>
                 </div>
 
-                <!-- 时间范围选择 -->
-                <div>
-                    <label for="startDate" class="block text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">
-                        开始时间范围:
-                    </label>
-                    <input type="datetime-local" id="startDate" class="shadow border rounded w-full py-2 px-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:shadow-outline">
+                <div class="control-group">
+                    <label for="startDate" class="control-label">开始时间范围</label>
+                    <input type="datetime-local" id="startDate" class="control-input">
                 </div>
 
-                <div>
-                    <label for="endDate" class="block text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">
-                        结束时间范围:
-                    </label>
-                    <input type="datetime-local" id="endDate" class="shadow border rounded w-full py-2 px-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:shadow-outline">
+                <div class="control-group">
+                    <label for="endDate" class="control-label">结束时间范围</label>
+                    <input type="datetime-local" id="endDate" class="control-input">
                 </div>
 
-                <!-- 时间间隔 -->
-                <div>
-                    <label for="timeInterval" class="block text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">
-                        时间间隔:
-                    </label>
-                    <select id="timeInterval" class="shadow border rounded w-full py-2 px-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:shadow-outline">
+                <div class="control-group">
+                    <label for="timeInterval" class="control-label">时间间隔</label>
+                    <select id="timeInterval" class="control-input">
                         <option value="5m">5 分钟</option>
                         <option value="15m">15 分钟</option>
                         <option value="30m">30 分钟</option>
@@ -107,34 +95,32 @@
                     </select>
                 </div>
 
-                <!-- 环比偏移 -->
-                <div>
-                    <label for="compareOffset" class="block text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">
-                        环比偏移:
-                    </label>
-                    <div class="flex gap-2">
-                        <input type="number" id="compareOffset" value="0" min="0" class="shadow border rounded py-2 px-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:shadow-outline w-24">
-                        <select id="compareUnit" class="shadow border rounded py-2 px-2 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 focus:outline-none focus:shadow-outline">
+                <div class="control-group">
+                    <label for="compareOffset" class="control-label">环比偏移</label>
+                    <div class="control-inline">
+                        <input type="number" id="compareOffset" value="0" min="0" class="control-input control-offset-input">
+                        <select id="compareUnit" class="control-input control-unit-select">
                             <option value="hours">小时</option>
                             <option value="days">天</option>
                         </select>
                     </div>
                 </div>
 
-                <!-- 查询按钮 -->
-                <div>
-                    <button id="fetchData" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                        查询
-                    </button>
+                <div class="control-actions">
+                    <button id="fetchData" class="query-btn" type="button">查询</button>
                 </div>
             </div>
+        </section>
 
-            <!-- 图表容器 -->
-            <canvas id="timeSeriesChart" aria-label="发帖量统计" role="img" class="bg-white dark:bg-gray-800 rounded shadow"></canvas>
-        </div>
+        <section class="panel-card chart-card" aria-label="图表区">
+            <h2 class="panel-section-title">发帖量趋势图</h2>
+            <p class="panel-section-subtitle">展示当前区间数据，并可按条件叠加技术指标与环比对比线。</p>
+            <div class="chart-frame">
+                <canvas id="timeSeriesChart" aria-label="发帖量统计" role="img" class="chart-canvas"></canvas>
+            </div>
+        </section>
 
-        <!-- Toast 提示组件 -->
-        <div id="toast" class="hidden fixed bottom-4 right-4 px-4 py-2 rounded shadow-lg transition-opacity duration-300"></div>
+        <div id="toast" class="toast hidden fixed bottom-4 right-4" role="status" aria-live="polite"></div>
     </div>
 </body>
 </html>

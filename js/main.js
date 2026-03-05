@@ -22,6 +22,8 @@ class App {
         this.compareOffsetInput = document.getElementById('compareOffset');
         this.compareUnitSelect = document.getElementById('compareUnit');
         this.indicatorSelect = document.getElementById('indicatorSelect');
+        this.toastEl = document.getElementById('toast');
+        this.toastTimer = null;
     }
 
     initManagers() {
@@ -61,8 +63,7 @@ class App {
         const compareResult = await this.getCompareResp(startDateUTC, endDateUTC, compareOffset, compareUnit, timeInterval, selectedIndicator);
         
         try {
-            this.fetchDataButton.disabled = true;
-            this.fetchDataButton.textContent = "查询中...";
+            this.setFetchButtonLoading(true);
 
             const [currentResp, compareResp] = await Promise.all([
                 api.fetchData(startDateUTC, endDateUTC, timeInterval, selectedIndicator),
@@ -73,21 +74,20 @@ class App {
             this.updateChartData(currentResp, compareResp, compareOffset, compareUnit, selectedIndicator);
         } catch (err) {
             console.error("数据获取或处理失败:", err);
-            alert(`获取数据失败: ${err.message}。请检查网络或控制台日志。`);
+            this.showToast(`获取数据失败: ${err.message}。请检查网络或控制台日志。`, 'error');
             this.chartManager.destroy();
         } finally {
-            this.fetchDataButton.disabled = false;
-            this.fetchDataButton.textContent = "查询";
+            this.setFetchButtonLoading(false);
         }
     }
 
     validateInputs(startDateUTC, endDateUTC) {
         if (!startDateUTC || !endDateUTC) {
-            alert("请输入有效的开始和结束时间！");
+            this.showToast("请输入有效的开始和结束时间！", 'error');
             return false;
         }
         if (moment(this.endDateInput.value).isBefore(moment(this.startDateInput.value))) {
-            alert("结束时间不能早于开始时间！");
+            this.showToast("结束时间不能早于开始时间！", 'error');
             return false;
         }
         return true;
@@ -161,6 +161,36 @@ class App {
         const twentyFourHoursAgo = moment().subtract(24, 'hours');
         this.startDateInput.value = twentyFourHoursAgo.local().format('YYYY-MM-DDTHH:mm');
         this.endDateInput.value = now.local().format('YYYY-MM-DDTHH:mm');
+    }
+
+    setFetchButtonLoading(isLoading) {
+        this.fetchDataButton.disabled = isLoading;
+        this.fetchDataButton.classList.toggle('is-loading', isLoading);
+        this.fetchDataButton.setAttribute('aria-busy', isLoading ? 'true' : 'false');
+        this.fetchDataButton.textContent = isLoading ? '查询中...' : '查询';
+    }
+
+    showToast(message, type = 'error') {
+        if (!this.toastEl) return;
+
+        if (this.toastTimer) {
+            clearTimeout(this.toastTimer);
+        }
+
+        this.toastEl.textContent = message;
+        this.toastEl.classList.remove('hidden', 'toast-success', 'toast-error', 'show');
+        this.toastEl.classList.add(type === 'success' ? 'toast-success' : 'toast-error');
+
+        requestAnimationFrame(() => {
+            this.toastEl.classList.add('show');
+        });
+
+        this.toastTimer = setTimeout(() => {
+            this.toastEl.classList.remove('show');
+            setTimeout(() => {
+                this.toastEl.classList.add('hidden');
+            }, 250);
+        }, 2600);
     }
 
     fetchInitialData() {
