@@ -30,20 +30,20 @@
 </head>
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
     <div class="container mx-auto p-4 dashboard-shell">
-        <header class="panel-card panel-header">
+        <header class="panel-header">
             <div>
-                <h1 class="panel-title">大时代景气指数 (NGA:706)</h1>
-                <p class="panel-subtitle">单屏控制面板与趋势图联动展示，支持快速区间、精确时间段与指标叠加查询。</p>
+                <p class="panel-meta">NGA:706</p>
+                <h1 class="panel-title">大时代景气指数</h1>
             </div>
-            <button id="toggleDark" class="theme-toggle-btn" title="切换到浅色模式">
-                <span id="themeIcon">☀</span>
+            <button id="toggleDark" class="theme-toggle-btn" title="切换到深色模式" aria-label="切换主题">
+                <span id="themeIcon" class="theme-toggle-icon" aria-hidden="true"></span>
             </button>
         </header>
 
         <main class="dashboard-main" aria-label="图表与筛选布局">
-            <details class="panel-card panel-controls panel-controls-aside" open>
+            <details class="panel-card panel-controls panel-controls-aside">
                 <summary class="panel-section-title panel-controls-summary">筛选与查询</summary>
-                <p class="panel-section-subtitle panel-controls-subtitle">先选择范围与间隔，再点击查询刷新图表。环比偏移仅在“环比”模式下生效。</p>
+                <p class="panel-section-subtitle panel-controls-subtitle">按需展开设置后点击查询，图表将按当前条件刷新。</p>
 
                 <div class="controls-grid">
                     <div class="control-group">
@@ -114,8 +114,8 @@
             </details>
 
             <section class="panel-card chart-card panel-content-main" aria-label="图表区">
-                <h2 class="panel-section-title">发帖量趋势图</h2>
-                <p class="panel-section-subtitle">展示当前区间数据，并可按条件叠加技术指标与环比对比线。</p>
+                <h2 class="panel-section-title">发帖量趋势</h2>
+                <p class="panel-section-subtitle">主图优先展示当前区间走势，支持按需叠加指标与环比线。</p>
                 <div class="chart-frame">
                     <canvas id="timeSeriesChart" aria-label="发帖量统计" role="img" class="chart-canvas"></canvas>
                 </div>

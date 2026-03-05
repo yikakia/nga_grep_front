@@ -36,7 +36,6 @@ class App {
     setupEventListeners() {
         this.rangeSelect.addEventListener('change', () => {
             dateUtils.setDateRange(this.startDateInput, this.endDateInput, this.rangeSelect.value);
-            this.fetchDataButton.click();
         });
 
         this.indicatorSelect.addEventListener('change', () => {
@@ -44,7 +43,6 @@ class App {
             const disableCompare = value !== "";
             this.compareOffsetInput.disabled = disableCompare;
             this.compareUnitSelect.disabled = disableCompare;
-            this.fetchDataButton.click();
         });
 
         this.fetchDataButton.addEventListener('click', () => this.handleFetchData());
