@@ -15,6 +15,23 @@
   --focus-ring: 0 0 0 3px rgba(59, 130, 246, 0.2);
   --brand-primary: #2563eb;
   --brand-primary-hover: #1d4ed8;
+
+  /* chart palette - light */
+  --chart-grid: rgba(148, 163, 184, 0.22);
+  --chart-axis: #64748b;
+  --chart-legend: #334155;
+  --chart-tooltip-bg: rgba(255, 255, 255, 0.96);
+  --chart-tooltip-text: #0f172a;
+  --chart-tooltip-border: #dbe3ee;
+
+  --series-primary: #2563eb;
+  --series-compare: #e11d48;
+  --series-ma5: #4f46e5;
+  --series-ma10: #7c3aed;
+  --series-boll-upper: #0284c7;
+  --series-boll-lower: #6366f1;
+  --series-boll-middle: #64748b;
+  --series-boll-fill: rgba(37, 99, 235, 0.09);
 }
 
 .dark {
@@ -30,6 +47,23 @@
   --focus-ring: 0 0 0 3px rgba(59, 130, 246, 0.28);
   --brand-primary: #3b82f6;
   --brand-primary-hover: #2563eb;
+
+  /* chart palette - dark first */
+  --chart-grid: rgba(148, 163, 184, 0.18);
+  --chart-axis: #94a3b8;
+  --chart-legend: #cbd5e1;
+  --chart-tooltip-bg: rgba(15, 23, 42, 0.96);
+  --chart-tooltip-text: #e2e8f0;
+  --chart-tooltip-border: #334155;
+
+  --series-primary: #38bdf8;
+  --series-compare: #fb7185;
+  --series-ma5: #a78bfa;
+  --series-ma10: #818cf8;
+  --series-boll-upper: #22d3ee;
+  --series-boll-lower: #818cf8;
+  --series-boll-middle: #94a3b8;
+  --series-boll-fill: rgba(56, 189, 248, 0.13);
 }
 
 body {

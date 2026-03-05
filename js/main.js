@@ -104,48 +104,81 @@ class App {
         return Promise.resolve(null);
     }
 
+    getCssVar(name, fallback) {
+        const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+        return value || fallback;
+    }
+
+    getChartTheme() {
+        return {
+            series: {
+                primary: this.getCssVar('--series-primary', '#38bdf8'),
+                compare: this.getCssVar('--series-compare', '#fb7185'),
+                ma5: this.getCssVar('--series-ma5', '#a78bfa'),
+                ma10: this.getCssVar('--series-ma10', '#818cf8'),
+                bollUpper: this.getCssVar('--series-boll-upper', '#22d3ee'),
+                bollLower: this.getCssVar('--series-boll-lower', '#818cf8'),
+                bollMiddle: this.getCssVar('--series-boll-middle', '#94a3b8'),
+                bollFill: this.getCssVar('--series-boll-fill', 'rgba(56, 189, 248, 0.13)')
+            },
+            chart: {
+                grid: this.getCssVar('--chart-grid', 'rgba(148, 163, 184, 0.18)'),
+                axis: this.getCssVar('--chart-axis', '#94a3b8'),
+                legend: this.getCssVar('--chart-legend', '#cbd5e1'),
+                tooltipBg: this.getCssVar('--chart-tooltip-bg', 'rgba(15, 23, 42, 0.96)'),
+                tooltipText: this.getCssVar('--chart-tooltip-text', '#e2e8f0'),
+                tooltipBorder: this.getCssVar('--chart-tooltip-border', '#334155')
+            }
+        };
+    }
+
     updateChartData(currentResp, compareResp, compareOffset, compareUnit, selectedIndicator) {
-        if (!currentResp ||!currentResp['data'] || !Array.isArray(currentResp['data'])) {
+        if (!currentResp || !currentResp['data'] || !Array.isArray(currentResp['data'])) {
             throw new Error("主数据格式无效");
         }
-        const currentData = currentResp['data'] ;
+        const currentData = currentResp['data'];
 
         const datasets = [];
         const labels = currentData.map(item => dateUtils.fromUTC(item.timestamp));
+        const chartTheme = this.getChartTheme();
 
         // 添加主数据
         datasets.push({
             label: '当前发帖量',
             data: currentData.map(item => item.value),
-            borderColor: 'rgb(75, 192, 192)',
-            tension: 0.1,
-            pointRadius: 1,
-            pointHoverRadius: 5
+            borderColor: chartTheme.series.primary,
+            borderWidth: 2.4,
+            tension: 0.28,
+            pointRadius: 0,
+            pointHoverRadius: 4,
+            pointHitRadius: 12
         });
 
         // 添加技术指标
         if (selectedIndicator && currentData[0] && selectedIndicator in currentData[0]) {
-            IndicatorHandler.process(selectedIndicator, datasets, currentData);
+            IndicatorHandler.process(selectedIndicator, datasets, currentData, chartTheme);
         }
 
         // 添加对比数据
-        if (compareResp &&compareResp['data'] && Array.isArray(compareResp['data']) && compareResp['data'].length > 0) {
-            this.addCompareDataset(datasets, compareResp['data'], currentData, compareOffset, compareUnit);
+        if (compareResp && compareResp['data'] && Array.isArray(compareResp['data']) && compareResp['data'].length > 0) {
+            this.addCompareDataset(datasets, compareResp['data'], currentData, compareOffset, compareUnit, chartTheme);
         }
 
-        this.chartManager.updateChart(labels, datasets);
+        this.chartManager.updateChart(labels, datasets, chartTheme.chart);
     }
 
-    addCompareDataset(datasets, compareData, currentData, compareOffset, compareUnit) {
+    addCompareDataset(datasets, compareData, currentData, compareOffset, compareUnit, chartTheme) {
         if (compareData.length === currentData.length) {
             datasets.push({
                 label: `对比发帖量 (${compareOffset}${compareUnit === 'days' ? '天' : '小时'}前)`,
                 data: compareData.map(item => item.value),
-                borderColor: 'rgb(255, 99, 132)',
-                tension: 0.1,
-                pointRadius: 1,
-                pointHoverRadius: 5,
-                borderDash: [5, 5]
+                borderColor: chartTheme.series.compare,
+                borderWidth: 2,
+                tension: 0.24,
+                pointRadius: 0,
+                pointHoverRadius: 4,
+                pointHitRadius: 12,
+                borderDash: [6, 4]
             });
         }
     }
