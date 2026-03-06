@@ -3,6 +3,7 @@ import { ChartManager } from './chart.js';
 import { dateUtils } from './dateUtils.js';
 import { api } from './api.js';
 import { IndicatorHandler } from './indicators.js';
+import { exportChartDataToCsv } from './exportCsv.js';
 
 class App {
     constructor() {
@@ -17,6 +18,7 @@ class App {
         this.startDateInput = document.getElementById('startDate');
         this.endDateInput = document.getElementById('endDate');
         this.fetchDataButton = document.getElementById('fetchData');
+        this.exportCsvButton = document.getElementById('exportCsv');
         this.timeIntervalSelect = document.getElementById('timeInterval');
         this.rangeSelect = document.getElementById('rangeSelect');
         this.compareOffsetInput = document.getElementById('compareOffset');
@@ -24,6 +26,8 @@ class App {
         this.indicatorSelect = document.getElementById('indicatorSelect');
         this.toastEl = document.getElementById('toast');
         this.toastTimer = null;
+        this.exportPayload = null;
+        this.setExportButtonDisabled(true);
     }
 
     initManagers() {
@@ -46,6 +50,9 @@ class App {
         });
 
         this.fetchDataButton.addEventListener('click', () => this.handleFetchData());
+        if (this.exportCsvButton) {
+            this.exportCsvButton.addEventListener('click', () => this.handleExportCsv());
+        }
     }
 
     async handleFetchData() {
@@ -69,10 +76,17 @@ class App {
                 // this.getCompareResp(startDateUTC, endDateUTC, compareOffset, compareUnit, timeInterval, selectedIndicator)
             ]);
 
-            this.updateChartData(currentResp, compareResp, compareOffset, compareUnit, selectedIndicator);
+            const chartData = this.updateChartData(currentResp, compareResp, compareOffset, compareUnit, selectedIndicator);
+            this.setExportPayload(chartData, {
+                startLocal: this.startDateInput.value,
+                endLocal: this.endDateInput.value,
+                timeInterval,
+                indicator: selectedIndicator
+            });
         } catch (err) {
             console.error("数据获取或处理失败:", err);
             this.showToast(`获取数据失败: ${err.message}。请检查网络或控制台日志。`, 'error');
+            this.clearExportPayload();
             this.chartManager.destroy();
         } finally {
             this.setFetchButtonLoading(false);
@@ -165,6 +179,7 @@ class App {
         }
 
         this.chartManager.updateChart(labels, datasets, chartTheme.chart);
+        return { labels, datasets };
     }
 
     addCompareDataset(datasets, compareData, currentData, compareOffset, compareUnit, chartTheme) {
@@ -199,6 +214,50 @@ class App {
         this.fetchDataButton.classList.toggle('is-loading', isLoading);
         this.fetchDataButton.setAttribute('aria-busy', isLoading ? 'true' : 'false');
         this.fetchDataButton.textContent = isLoading ? '查询中...' : '查询';
+        this.setExportButtonDisabled(isLoading || !this.exportPayload);
+    }
+
+    setExportButtonDisabled(disabled) {
+        if (!this.exportCsvButton) return;
+        this.exportCsvButton.disabled = disabled;
+    }
+
+    setExportPayload(chartData, meta) {
+        const labels = Array.isArray(chartData?.labels) ? chartData.labels : [];
+        const datasets = Array.isArray(chartData?.datasets) ? chartData.datasets : [];
+
+        if (labels.length === 0 || datasets.length === 0) {
+            this.clearExportPayload();
+            return;
+        }
+
+        this.exportPayload = {
+            labels: [...labels],
+            datasets: datasets.map(dataset => ({
+                label: dataset.label,
+                data: Array.isArray(dataset.data) ? [...dataset.data] : []
+            })),
+            meta: {
+                startLocal: meta?.startLocal || '',
+                endLocal: meta?.endLocal || '',
+                timeInterval: meta?.timeInterval || '',
+                indicator: meta?.indicator || ''
+            }
+        };
+    }
+
+    clearExportPayload() {
+        this.exportPayload = null;
+        this.setExportButtonDisabled(true);
+    }
+
+    handleExportCsv() {
+        try {
+            const result = exportChartDataToCsv(this.exportPayload);
+            this.showToast(`导出成功：${result.fileName}（${result.rowCount}行）`, 'success');
+        } catch (err) {
+            this.showToast(`导出失败：${err.message}`, 'error');
+        }
     }
 
     showToast(message, type = 'error') {
