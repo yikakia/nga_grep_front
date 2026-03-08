@@ -5,6 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light dark">
     <title>大时代景气指数</title>
+    <script>
+        (() => {
+            const STORAGE_KEY = 'theme';
+            try {
+                const savedTheme = sessionStorage.getItem(STORAGE_KEY);
+                const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const useDark = savedTheme === 'dark' || (!savedTheme && systemPrefersDark);
+                document.documentElement.classList.toggle('dark', useDark);
+                document.documentElement.style.colorScheme = useDark ? 'dark' : 'light';
+            } catch (err) {
+                const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                document.documentElement.classList.toggle('dark', systemPrefersDark);
+                document.documentElement.style.colorScheme = systemPrefersDark ? 'dark' : 'light';
+            }
+        })();
+    </script>
     <!-- CDN 资源 -->
     <!-- <script src="https://cdn.tailwindcss.com" data-cfasync="false"></script> -->
     <link href="./output.css" rel="stylesheet">
