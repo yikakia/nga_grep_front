@@ -28,6 +28,19 @@ function indentLines(content, indent, eol) {
 
 function buildInlineBlock(preloadSource, eol) {
   const baseIndent = '    ';
+  const preloadStyle = [
+    'html.theme-preload-lock body {',
+    '    visibility: hidden;',
+    '}',
+    'html[data-theme="dark"] {',
+    '    background-color: #0b1220;',
+    '    color: #e5e7eb;',
+    '}',
+    'html[data-theme="light"] {',
+    '    background-color: #f5f7fb;',
+    '    color: #0f172a;',
+    '}'
+  ].join(eol);
   const runtimeScript = [
     '// AUTO-GENERATED FROM ./js/theme-preload.js. DO NOT EDIT DIRECTLY.',
     normalizeEol(preloadSource.trim(), eol),
@@ -36,6 +49,9 @@ function buildInlineBlock(preloadSource, eol) {
 
   return [
     `${baseIndent}${START_MARKER}`,
+    `${baseIndent}<style id="theme-preload-style">`,
+    indentLines(preloadStyle, `${baseIndent}    `, eol),
+    `${baseIndent}</style>`,
     `${baseIndent}<script>`,
     indentLines(runtimeScript, `${baseIndent}    `, eol),
     `${baseIndent}</script>`,

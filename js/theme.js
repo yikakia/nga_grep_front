@@ -29,13 +29,13 @@ export class ThemeManager {
             this.updateThemeIcon(isDark);
         });
 
-        this.applyTheme();
+        this.syncThemeState();
         this.setupSystemThemeListener();
+        this.runtime.unlockWhenReady?.();
     }
 
-    applyTheme() {
-        const theme = this.runtime.resolveTheme();
-        const isDark = this.runtime.applyTheme(theme);
+    syncThemeState() {
+        const isDark = document.documentElement.classList.contains(this.runtime.DARK);
         this.updateThemeIcon(isDark);
     }
 

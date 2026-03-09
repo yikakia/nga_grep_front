@@ -71,6 +71,13 @@ body {
   color: var(--text-primary);
 }
 
+html.theme-preload-lock *,
+html.theme-preload-lock *::before,
+html.theme-preload-lock *::after {
+  transition: none !important;
+  animation: none !important;
+}
+
 .dashboard-shell {
   max-width: 1360px;
 }
