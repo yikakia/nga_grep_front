@@ -102,10 +102,45 @@ html.theme-preload-lock *::after {
 
 .panel-meta {
   margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   color: var(--text-muted);
+}
+
+.panel-meta-text {
+  line-height: 1;
+}
+
+.panel-meta-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 0.92rem;
+  height: 0.92rem;
+  line-height: 1;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  opacity: 0.72;
+  text-decoration: none;
+  border-radius: 9999px;
+  transition: color 0.2s ease, opacity 0.2s ease, background-color 0.2s ease;
+}
+
+.panel-meta-link:hover {
+  color: var(--text-secondary);
+  opacity: 1;
+  background-color: var(--bg-surface-muted);
+}
+
+.panel-meta-link:focus-visible {
+  outline: none;
+  opacity: 1;
+  color: var(--text-secondary);
+  box-shadow: var(--focus-ring);
 }
 
 .panel-title {
