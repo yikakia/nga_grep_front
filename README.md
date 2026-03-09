@@ -1,10 +1,10 @@
-使用 npm 进行包管理
+## 安装依赖
 
 ```bash
 npm install
 ```
 
-使用 tailwindcss 编译
+## 使用 tailwindcss 编译
 
 [安装](https://tailwindcss.com/docs/installation/tailwind-cli)
 
@@ -12,16 +12,27 @@ npm install
 tailwindcss -o output.css
 ```
 
-开发调试运行
-```bash
-# 如果改了 theme.js 中的内容 需要重新注入到 index.html 中让他生效
-npm run prestart
-npm run prebuild
+## 主题脚本注入机制
 
-# 开发&预览
-npm run dev
-# 生产
-npm run build
+- `index.template.html` 是可维护模板文件。
+- `index.html` 是最终产物，由脚本自动生成，请不要手改。
+- `scripts/inject-theme-preload.js` 会把 `js/theme-preload.js` 内联到模板中的 `<!-- THEME_PRELOAD_INJECT -->` 占位符位置。
+
+可手动执行：
+
+```bash
+npm run theme:inject
 ```
 
-_header 文件可能没用？
+## 开发与构建
+
+- `npm run dev` 前会自动执行 `theme:inject`（通过 `prestart`）。
+- `npm run build` 前会自动执行 `theme:inject`（通过 `prebuild`）。
+
+```bash
+# 开发
+npm run dev
+
+# 生产构建
+npm run build
+```
