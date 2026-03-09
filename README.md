@@ -14,6 +14,10 @@ tailwindcss -o output.css
 
 开发调试运行
 ```bash
+# 如果改了 theme.js 中的内容 需要重新注入到 index.html 中让他生效
+npm run prestart
+npm run prebuild
+
 # 开发&预览
 npm run dev
 # 生产
