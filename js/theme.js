@@ -2,6 +2,12 @@ export class ThemeManager {
     constructor() {
         this.toggleBtn = document.getElementById('toggleDark');
         this.themeIcon = document.getElementById('themeIcon');
+        this.runtime = window.__themeRuntime;
+
+        if (!this.toggleBtn || !this.themeIcon || !this.runtime) {
+            return;
+        }
+
         this.init();
     }
 
@@ -16,8 +22,10 @@ export class ThemeManager {
 
     init() {
         this.toggleBtn.addEventListener('click', () => {
-            const isDark = document.documentElement.classList.toggle('dark');
-            sessionStorage.setItem('theme', isDark ? 'dark' : 'light');
+            const currentIsDark = document.documentElement.classList.contains(this.runtime.DARK);
+            const nextTheme = currentIsDark ? this.runtime.LIGHT : this.runtime.DARK;
+            const isDark = this.runtime.applyTheme(nextTheme);
+            this.runtime.writeStoredTheme(nextTheme);
             this.updateThemeIcon(isDark);
         });
 
@@ -26,19 +34,17 @@ export class ThemeManager {
     }
 
     applyTheme() {
-        const savedTheme = sessionStorage.getItem('theme');
-        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const useDark = savedTheme === 'dark' || (!savedTheme && systemPrefersDark);
-
-        document.documentElement.classList.toggle('dark', useDark);
-        this.updateThemeIcon(useDark);
+        const theme = this.runtime.resolveTheme();
+        const isDark = this.runtime.applyTheme(theme);
+        this.updateThemeIcon(isDark);
     }
 
     setupSystemThemeListener() {
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-            const savedTheme = sessionStorage.getItem('theme');
+        window.matchMedia(this.runtime.MEDIA_QUERY).addEventListener('change', e => {
+            const savedTheme = this.runtime.readStoredTheme();
             if (!savedTheme) {
-                document.documentElement.classList.toggle('dark', e.matches);
+                const theme = e.matches ? this.runtime.DARK : this.runtime.LIGHT;
+                this.runtime.applyTheme(theme);
                 this.updateThemeIcon(e.matches);
             }
         });

@@ -5,22 +5,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light dark">
     <title>大时代景气指数</title>
+                <!-- THEME_PRELOAD:START -->
     <script>
-        (() => {
+        // AUTO-GENERATED FROM ./js/theme-preload.js. DO NOT EDIT DIRECTLY.
+        (function (global) {
             const STORAGE_KEY = 'theme';
-            try {
-                const savedTheme = sessionStorage.getItem(STORAGE_KEY);
-                const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                const useDark = savedTheme === 'dark' || (!savedTheme && systemPrefersDark);
-                document.documentElement.classList.toggle('dark', useDark);
-                document.documentElement.style.colorScheme = useDark ? 'dark' : 'light';
-            } catch (err) {
-                const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                document.documentElement.classList.toggle('dark', systemPrefersDark);
-                document.documentElement.style.colorScheme = systemPrefersDark ? 'dark' : 'light';
+            const DARK = 'dark';
+            const LIGHT = 'light';
+            const MEDIA_QUERY = '(prefers-color-scheme: dark)';
+        
+            function readStoredTheme() {
+                try {
+                    const value = sessionStorage.getItem(STORAGE_KEY);
+                    return value === DARK || value === LIGHT ? value : null;
+                } catch (err) {
+                    return null;
+                }
             }
-        })();
+        
+            function writeStoredTheme(theme) {
+                try {
+                    sessionStorage.setItem(STORAGE_KEY, theme);
+                } catch (err) {
+                    // ignore write failures (e.g. private mode restrictions)
+                }
+            }
+        
+            function getSystemPreferredTheme() {
+                return global.matchMedia && global.matchMedia(MEDIA_QUERY).matches ? DARK : LIGHT;
+            }
+        
+            function resolveTheme() {
+                return readStoredTheme() || getSystemPreferredTheme();
+            }
+        
+            function applyTheme(theme) {
+                const useDark = theme === DARK;
+                const root = document.documentElement;
+                root.classList.toggle(DARK, useDark);
+                root.style.colorScheme = useDark ? DARK : LIGHT;
+                return useDark;
+            }
+        
+            function applyInitialTheme() {
+                return applyTheme(resolveTheme());
+            }
+        
+            global.__themeRuntime = {
+                STORAGE_KEY,
+                DARK,
+                LIGHT,
+                MEDIA_QUERY,
+                readStoredTheme,
+                writeStoredTheme,
+                getSystemPreferredTheme,
+                resolveTheme,
+                applyTheme,
+                applyInitialTheme
+            };
+        })(window);
+        window.__themeRuntime?.applyInitialTheme();
     </script>
+    <!-- THEME_PRELOAD:END -->
     <!-- CDN 资源 -->
     <!-- <script src="https://cdn.tailwindcss.com" data-cfasync="false"></script> -->
     <link href="./output.css" rel="stylesheet">
