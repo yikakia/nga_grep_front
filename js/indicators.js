@@ -50,7 +50,8 @@ export class IndicatorHandler {
                     tension: 0.24,
                     pointRadius: 0,
                     pointHoverRadius: 4,
-                    pointHitRadius: 10
+                    pointHitRadius: 10,
+                    borderDash: [4, 4]
                 });
             }
         },
