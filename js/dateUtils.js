@@ -21,6 +21,8 @@ export const dateUtils = {
             '14d': {value: 14, unit: 'days'},
             '30d': {value: 30, unit: 'days'},
             '60d': {value: 60, unit: 'days'},
+            '180d': {value: 180, unit: 'days'},
+            '360d': {value: 360, unit: 'days'},
         };
 
         const option = rangeOptions[range];
