@@ -40,6 +40,7 @@ class App {
     setupEventListeners() {
         this.rangeSelect.addEventListener('change', () => {
             dateUtils.setDateRange(this.startDateInput, this.endDateInput, this.rangeSelect.value);
+            this.updateTimeIntervalForRange(this.rangeSelect.value);
         });
 
         this.indicatorSelect.addEventListener('change', () => {
@@ -53,6 +54,52 @@ class App {
         if (this.exportCsvButton) {
             this.exportCsvButton.addEventListener('click', () => this.handleExportCsv());
         }
+    }
+
+    updateTimeIntervalForRange(range) {
+        const rangeToHours = {
+            '2h': 2,
+            '8h': 8,
+            '24h': 24,
+            '3d': 72,
+            '5d': 120,
+            '7d': 168,
+            '14d': 336,
+            '30d': 720,
+            '60d': 1440,
+            '180d': 4320,
+            '360d': 8640,
+        };
+
+        const intervals = [
+            { value: '5m', hours: 5 / 60 },
+            { value: '15m', hours: 15 / 60 },
+            { value: '30m', hours: 30 / 60 },
+            { value: '1h', hours: 1 },
+            { value: '4h', hours: 4 },
+            { value: '12h', hours: 12 },
+            { value: '24h', hours: 24 },
+            { value: '168h', hours: 168 },
+            { value: '336h', hours: 336 },
+        ];
+
+        const durationHours = rangeToHours[range];
+        if (!durationHours) return;
+
+        const TARGET_POINTS = 200;
+
+        let best = intervals[0];
+        let bestDiff = Math.abs(durationHours / best.hours - TARGET_POINTS);
+        for (let i = 1; i < intervals.length; i++) {
+            const points = durationHours / intervals[i].hours;
+            const diff = Math.abs(points - TARGET_POINTS);
+            if (diff < bestDiff) {
+                bestDiff = diff;
+                best = intervals[i];
+            }
+        }
+
+        this.timeIntervalSelect.value = best.value;
     }
 
     async handleFetchData() {
@@ -199,8 +246,9 @@ class App {
     }
 
     initDefaultValues() {
-        this.rangeSelect.value = '24h';
-        this.timeIntervalSelect.value = '15m';
+        const defaultRange = '24h';
+        this.rangeSelect.value = defaultRange;
+        this.updateTimeIntervalForRange(defaultRange);
         this.compareUnitSelect.value = 'days';
 
         const now = moment();
