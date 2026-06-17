@@ -86,7 +86,7 @@ class App {
         const durationHours = rangeToHours[range];
         if (!durationHours) return;
 
-        const TARGET_POINTS = 200;
+        const TARGET_POINTS = 180;
 
         let best = intervals[0];
         let bestDiff = Math.abs(durationHours / best.hours - TARGET_POINTS);
